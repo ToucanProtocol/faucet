@@ -1,10 +1,10 @@
 import { ethers } from "hardhat";
-import { DEX, ToucanCarbonOffsets } from "../typechain";
+import {TCO2Faucet, ToucanCarbonOffsets} from "../typechain";
 import { ContractTransaction } from "ethers";
 
 const deposit = async (
   tco: ToucanCarbonOffsets,
-  faucet: Faucet,
+  faucet: TCO2Faucet,
   tco2Address: string,
   amount: string
 ): Promise<ContractTransaction> => {

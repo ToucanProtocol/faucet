@@ -2,7 +2,7 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { ethers, network } from "hardhat";
 // eslint-disable-next-line node/no-missing-import,camelcase
-import { DEX, DEX__factory, ToucanCarbonOffsets } from "../typechain";
+import {TCO2Faucet, TCO2Faucet__factory, ToucanCarbonOffsets} from "../typechain";
 import * as tcoAbi from "../artifacts/contracts/CO2KEN_contracts/ToucanCarbonOffsets.sol/ToucanCarbonOffsets.json";
 import deposit from "../utils/deposit";
 import { BigNumber } from "ethers";
@@ -20,8 +20,8 @@ const myAddress: string = "0x721F6f7A29b99CbdE1F18C4AA7D7AEb31eb2923B";
 
 // TODO implement tests with .to.be.revertedWith
 
-describe("DEX", function () {
-  let faucet: Faucet;
+describe("TCO2Faucet", function () {
+  let faucet: TCO2Faucet;
   let tco: ToucanCarbonOffsets;
   let owner: SignerWithAddress;
   let addr1: SignerWithAddress;
@@ -46,12 +46,12 @@ describe("DEX", function () {
     [addr1, addr2, ...addrs] = await ethers.getSigners();
 
     // we deploy a Faucet contract and get a portal to it
-    const faucetFactory = (await ethers.getContractFactory(
-      "Faucet",
+    const TCO2FaucetFactory = (await ethers.getContractFactory(
+      "TCO2Faucet",
       owner
       // eslint-disable-next-line camelcase
-    )) as Faucet__factory;
-    faucet = await faucetFactory.deploy(tco2Address);
+    )) as TCO2Faucet__factory;
+    faucet = await TCO2FaucetFactory.deploy(tco2Address);
 
     // we instantiate a portal to my TCO2 contract
     // @ts-ignore
