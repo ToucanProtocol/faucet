@@ -2,10 +2,11 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { ethers, network } from "hardhat";
 // eslint-disable-next-line node/no-missing-import,camelcase
-import {Faucet, TCO2Faucet, TCO2Faucet__factory, ToucanCarbonOffsets} from "../typechain";
+import { TCO2Faucet, TCO2Faucet__factory, ToucanCarbonOffsets} from "../typechain";
 import * as tcoAbi from "../artifacts/contracts/CO2KEN_contracts/ToucanCarbonOffsets.sol/ToucanCarbonOffsets.json";
 import deposit from "../utils/deposit";
 import { BigNumber } from "ethers";
+import withdraw from "../utils/withdraw";
 
 // this is the TCO2 address from the test.toucan.earth/contracts list for Mumbai network
 // const tco2Address: string = "0x788d12e9f6E5D65a0Fa4C3f5D6AA34Ef39A6E582";
