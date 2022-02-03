@@ -117,7 +117,7 @@ describe("TCO2Faucet", function () {
       expect(withdrawTxn.confirmations).to.be.above(0);
 
       /**
-       * we check the my TCO2 balance after depositing some of it
+       * we check my TCO2 balance after withdrawing some of it from the faucet
        * and we are expecting it to be more by the withdrawn amount
        */
       const myTcoBalanceAfter = await tco.balanceOf(myAddress);
