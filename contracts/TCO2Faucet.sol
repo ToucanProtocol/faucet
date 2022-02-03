@@ -15,6 +15,7 @@ contract TCO2Faucet {
     address public tco2Address;
     address public owner;
     mapping(address => uint256) private tokenBalances;
+    mapping(address => uint256) private lastWithdrawalTimes;
     event Deposited(address erc20Addr, uint256 amount);
     event Withdrawn(address account, address erc20Addr, uint256 amount);
 
@@ -54,10 +55,32 @@ contract TCO2Faucet {
         emit Deposited(_erc20Address, _amount);
     }
 
+    // I decided to have the withdrawal function have a 30s timeout to make sure that nobody spams the faucet.
+    //
+    // When someone uses it, if the lastWithdrawalTime for their address is not set, it sets it to
+    // block.timestamp (right now) - the timeout limit (30s).
+    //
+    // We then check if the lastWithdrawalTime is less (earlier) than block.timestamp by
+    // the timeout limit (30s).
+    function checkIfWithdrawalTimeout() public returns (bool) {
+        uint256 timeoutLimit = 30; // amount of seconds in between withdrawals
+        if (lastWithdrawalTimes[msg.sender] == 0) {
+            lastWithdrawalTimes[msg.sender] = block.timestamp - timeoutLimit;
+        }
+        if (lastWithdrawalTimes[msg.sender] <= block.timestamp - timeoutLimit) {
+            return false;
+        }
+        return true;
+    }
+
     function withdraw(address _erc20Address, uint256 _amount) public {
         // check token eligibility
         bool eligibility = checkEligible(_erc20Address);
         require(eligibility, "Token rejected");
+
+        // check if the user is in a withdrawal timeout
+        require(!checkIfWithdrawalTimeout(), "Can't withdraw that often");
+        lastWithdrawalTimes[msg.sender] = block.timestamp;
 
         // require that the person didn't request more than the contract has
         require(

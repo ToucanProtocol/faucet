@@ -133,5 +133,34 @@ describe("TCO2Faucet", function () {
       const faucetTcoBalance = await faucet.getTokenBalance(tco2Address);
       expect(ethers.utils.formatEther(faucetTcoBalance)).to.eql("0.0");
     });
+
+    it("Should revert the second transaction with a timeout", async () => {
+      const amountToDeposit = "2.0";
+      const amountToWithdraw = "1.0";
+
+      /**
+       * we first deposit the amount that we want to withdraw because this is a freshly deployed
+       * contract and has no TCO2 in its balance
+       */
+      await deposit(tco, faucet, tco2Address, amountToDeposit);
+
+      /**
+       * we attempt the first withdrawal, which should work
+       */
+      const firstWithdrawalTxn = await withdraw(tco, faucet, tco2Address, amountToWithdraw);
+      expect(firstWithdrawalTxn.confirmations).to.be.above(0);
+
+      /**
+       * we attempt the second withdrawal, which should not work
+       * I decided to have the withdrawal function have a timeout to make sure that nobody spams the faucet
+       */
+      await expect(faucet.withdraw(
+          tco2Address,
+          ethers.utils.parseEther(amountToWithdraw),
+          {
+            gasLimit: 1200000,
+          }
+      )).to.be.revertedWith("Can't withdraw that often");
+    })
   });
 });
