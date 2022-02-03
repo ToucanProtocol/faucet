@@ -16,6 +16,7 @@ contract TCO2Faucet {
     address public owner;
     mapping(address => uint256) private tokenBalances;
     event Deposited(address erc20Addr, uint256 amount);
+    event Withdrawn(address account, address erc20Addr, uint256 amount);
 
     constructor (address _tco2Address)  {
         tco2Address = _tco2Address;
@@ -54,6 +55,23 @@ contract TCO2Faucet {
     }
 
     function withdraw(address _erc20Address, uint256 _amount) public {
-        // TODO
+        // check token eligibility
+        bool eligibility = checkEligible(_erc20Address);
+        require(eligibility, "Token rejected");
+
+        // require that the person didn't request more than the contract has
+        require(
+            tokenBalances[_erc20Address] >= _amount,
+            "Cannot withdraw more than is stored in contract"
+        );
+
+        // subtract amount of said token from the balance sheet of this contract
+        tokenBalances[_erc20Address] -= _amount;
+
+        // use TCO contract to do a safe transfer from this contract to the user
+        IERC20(_erc20Address).safeTransfer(msg.sender, _amount);
+
+        // emit an event for good measure
+        emit Withdrawn(msg.sender, _erc20Address, _amount);
     }
 }
