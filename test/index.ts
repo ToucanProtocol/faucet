@@ -2,7 +2,7 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { ethers, network } from "hardhat";
 // eslint-disable-next-line node/no-missing-import,camelcase
-import {TCO2Faucet, TCO2Faucet__factory, ToucanCarbonOffsets} from "../typechain";
+import {Faucet, TCO2Faucet, TCO2Faucet__factory, ToucanCarbonOffsets} from "../typechain";
 import * as tcoAbi from "../artifacts/contracts/CO2KEN_contracts/ToucanCarbonOffsets.sol/ToucanCarbonOffsets.json";
 import deposit from "../utils/deposit";
 import { BigNumber } from "ethers";
@@ -68,7 +68,7 @@ describe("TCO2Faucet", function () {
       const myTcoBalanceBefore = await tco.balanceOf(myAddress);
 
       /**
-       * we attempt to deposit an amount of TCO2 into the DEX contract.
+       * we attempt to deposit an amount of TCO2 into the Faucet contract.
        * I have separated in the deposit() function for readability
        */
       const depositTxn = await deposit(tco, faucet, tco2Address, amountToDeposit);
@@ -86,10 +86,51 @@ describe("TCO2Faucet", function () {
 
       /**
        * we check the TCO2 balance of the contract to see if it changed.
-       * Normally it should be equal to 1.0 as we redeploy a new DEX contract before each test.
+       * Normally it should be equal to 1.0 as we redeploy a new Faucet contract before each test.
        */
-      const dexTcoBalance = await faucet.getTokenBalance(tco2Address);
-      expect(ethers.utils.formatEther(dexTcoBalance)).to.eql("1.0");
+      const faucetTcoBalance = await faucet.getTokenBalance(tco2Address);
+      expect(ethers.utils.formatEther(faucetTcoBalance)).to.eql("1.0");
+    });
+  });
+
+  describe("Withdraw", function () {
+    it("Should withdraw 1 TCO2", async function () {
+      const amountToWithdraw = "1.0";
+
+      /**
+       * we first deposit the amount that we want to withdraw because this is a freshly deployed
+       * contract and has no TCO2 in its balance
+       */
+      await deposit(tco, faucet, tco2Address, amountToWithdraw);
+
+      /**
+       * we check my TCO2 before depositing some of it
+       */
+      const myTcoBalanceBefore = await tco.balanceOf(myAddress);
+
+      /**
+       * we attempt to withdraw an amount of TCO2 from the Faucet contract.
+       * I have separated in the withdraw() function for readability
+       */
+      const withdrawTxn = await withdraw(tco, faucet, tco2Address, amountToWithdraw);
+      expect(withdrawTxn.confirmations).to.be.above(0);
+
+      /**
+       * we check the my TCO2 balance after depositing some of it
+       * and we are expecting it to be more by the withdrawn amount
+       */
+      const myTcoBalanceAfter = await tco.balanceOf(myAddress);
+      const expectedTcoBalance = myTcoBalanceBefore.add(
+          ethers.utils.parseEther(amountToWithdraw)
+      );
+      expect(myTcoBalanceAfter).to.eql(expectedTcoBalance);
+
+      /**
+       * we check the TCO2 balance of the contract to see if it changed.
+       * Normally it should be equal to 0.0 as we redeploy a new Faucet contract before each test.
+       */
+      const faucetTcoBalance = await faucet.getTokenBalance(tco2Address);
+      expect(ethers.utils.formatEther(faucetTcoBalance)).to.eql("0.0");
     });
   });
 });
