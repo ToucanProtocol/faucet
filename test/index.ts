@@ -15,11 +15,9 @@ import withdraw from "../utils/withdraw";
  * This is my the address of my TCO2 coins.
  * I got it from my test project (Yingpeng HFC23 Decompostion Project).
  */
-const tco2Address: string = "0xa5831eb637dff307395b5183c86B04c69C518681";
+const tco2Address: string = "0xa5831eb637dff307395b5183c86b04c69c518681";
 // and this is the address that I wish to deploy from
 const myAddress: string = "0x721F6f7A29b99CbdE1F18C4AA7D7AEb31eb2923B";
-
-// TODO implement tests with .to.be.revertedWith
 
 describe("TCO2Faucet", function () {
   let faucet: TCO2Faucet;
