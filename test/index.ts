@@ -72,8 +72,7 @@ describe("TCO2Faucet", function () {
        * we attempt to deposit an amount of TCO2 into the Faucet contract.
        * I have separated in the deposit() function for readability
        */
-      const depositTxn = await deposit(tco, faucet, tco2Address, amountToDeposit);
-      expect(depositTxn.confirmations).to.be.above(0);
+      await deposit(tco, faucet, tco2Address, amountToDeposit);
 
       /**
        * we check the my TCO2 balance after depositing some of it
@@ -113,8 +112,7 @@ describe("TCO2Faucet", function () {
        * we attempt to withdraw an amount of TCO2 from the Faucet contract.
        * I have separated in the withdraw() function for readability
        */
-      const withdrawTxn = await withdraw(tco, faucet, tco2Address, amountToWithdraw);
-      expect(withdrawTxn.confirmations).to.be.above(0);
+      await withdraw(tco, faucet, tco2Address, amountToWithdraw);
 
       /**
        * we check my TCO2 balance after withdrawing some of it from the faucet
@@ -147,12 +145,17 @@ describe("TCO2Faucet", function () {
       /**
        * we attempt the first withdrawal, which should work
        */
-      const firstWithdrawalTxn = await withdraw(tco, faucet, tco2Address, amountToWithdraw);
-      expect(firstWithdrawalTxn.confirmations).to.be.above(0);
+      await withdraw(tco, faucet, tco2Address, amountToWithdraw);
 
       /**
        * we attempt the second withdrawal, which should not work
        * I decided to have the withdrawal function have a timeout to make sure that nobody spams the faucet
+       */
+      /**
+       * TODO there is an issue with this test. The issue is with the test itself, not with the Solidity code.
+       * When testing on my Mumbai fork, the test evaluates correctly. When testing on Mumbai itself,
+       * the transaction still gets reverted (with the correct error), but the test doesn't see it.
+       * Absolutely 0 idea why...
        */
       await expect(faucet.withdraw(
           tco2Address,
@@ -160,7 +163,7 @@ describe("TCO2Faucet", function () {
           {
             gasLimit: 1200000,
           }
-      )).to.be.revertedWith("Can't withdraw that often");
+      )).to.be.revertedWith("Cannot withdraw that often");
     })
   });
 });

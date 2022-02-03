@@ -9,7 +9,7 @@ const withdraw = async (
     amount: string
 ): Promise<ContractTransaction> => {
     // we then withdraw the amount of TCO2 from the Faucet contract
-    const depositTxn = await faucet.withdraw(
+    const withdrawTxn = await faucet.withdraw(
         tco2Address,
         ethers.utils.parseEther(amount),
         {
@@ -18,8 +18,8 @@ const withdraw = async (
     );
 
     // wait for the transaction to be confirmed and return it
-    await depositTxn.wait();
-    return depositTxn;
+    await withdrawTxn.wait();
+    return withdrawTxn;
 };
 
 export default withdraw;

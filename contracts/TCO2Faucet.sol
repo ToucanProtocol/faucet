@@ -79,7 +79,7 @@ contract TCO2Faucet {
         require(eligibility, "Token rejected");
 
         // check if the user is in a withdrawal timeout
-        require(!checkIfWithdrawalTimeout(), "Can't withdraw that often");
+        require(!checkIfWithdrawalTimeout(), "Cannot withdraw that often");
         lastWithdrawalTimes[msg.sender] = block.timestamp;
 
         // require that the person didn't request more than the contract has
