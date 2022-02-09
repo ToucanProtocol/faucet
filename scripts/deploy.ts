@@ -1,13 +1,8 @@
 import { ethers } from "hardhat";
 
 async function main() {
-  /**
-   * this is the address of my Mumbai TCO2 (Toucan Protocol: TCO2-VCS-439-2008)
-   * from Yingpeng HFC23 Decompostion Project
-   */
-  const tco2Address = "0xa5831eb637dff307395b5183c86b04c69c518681";
   const FaucetFactory = await ethers.getContractFactory("TCO2Faucet");
-  const faucet = await FaucetFactory.deploy(tco2Address);
+  const faucet = await FaucetFactory.deploy();
 
   await faucet.deployed();
 
