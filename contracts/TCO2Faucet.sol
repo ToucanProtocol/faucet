@@ -7,32 +7,45 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 // You could use NPM publish, but this works for now.
 import "./CO2KEN_contracts/ToucanCarbonOffsets.sol";
 import "./CO2KEN_contracts/pools/BaseCarbonTonne.sol";
+import "./CO2KEN_contracts/IToucanContractRegistry.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-contract TCO2Faucet {
+contract TCO2Faucet is OwnableUpgradeable {
     using SafeERC20 for IERC20;
 
-    uint256 public footprint;
-    address public tco2Address;
-    address public owner;
+    address public contractRegistry = 0x6739D490670B2710dc7E79bB12E455DE33EE1cb6;
     mapping(address => uint256) private tokenBalances;
     mapping(address => uint256) private lastWithdrawalTimes;
     event Deposited(address erc20Addr, uint256 amount);
     event Withdrawn(address account, address erc20Addr, uint256 amount);
 
-    constructor (address _tco2Address)  {
-        tco2Address = _tco2Address;
+    // @description you can use this to change the TCO2 contracts registry if needed
+    // @param _address the contract registry to use
+    function setToucanContractRegistry(address _address)
+    public
+    virtual
+    onlyOwner
+    {
+        contractRegistry = _address;
     }
 
     function getTokenBalance(address _erc20Address) public view returns (uint256) {
         return tokenBalances[_erc20Address];
     }
 
-    /* @notice Internal function that checks if token to be deposited is eligible for this contract
-     * @param _erc20Address ERC20 contract address to be checked
-     * this can be changed in the future to contain other tokens
-     */
-    function checkEligible(address _erc20Address) public view returns (bool) {
-        if (_erc20Address == tco2Address) return true;
+    // @description checks if token to be deposited is eligible for this pool
+    // @param _erc20Address address to be checked
+    function checkTokenEligibility(address _erc20Address)
+    private
+    view
+    returns (bool)
+    {
+        // check if token is a TCO2
+        bool isToucanContract = IToucanContractRegistry(contractRegistry)
+        .checkERC20(_erc20Address);
+        if (isToucanContract) return true;
+
+        // nothing matches, return false
         return false;
     }
 
@@ -42,7 +55,7 @@ contract TCO2Faucet {
      */
     function deposit(address _erc20Address, uint256 _amount) public {
         // check token eligibility
-        bool eligibility = checkEligible(_erc20Address);
+        bool eligibility = checkTokenEligibility(_erc20Address);
         require(eligibility, "Token rejected");
 
         // use TCO contract to do a safe transfer from the user to this contract
@@ -75,7 +88,7 @@ contract TCO2Faucet {
 
     function withdraw(address _erc20Address, uint256 _amount) public {
         // check token eligibility
-        bool eligibility = checkEligible(_erc20Address);
+        bool eligibility = checkTokenEligibility(_erc20Address);
         require(eligibility, "Token rejected");
 
         // check if the user is in a withdrawal timeout
