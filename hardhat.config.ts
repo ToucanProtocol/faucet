@@ -48,10 +48,6 @@ const config: HardhatUserConfig = {
       },
     },
   },
-  gasReporter: {
-    enabled: process.env.REPORT_GAS !== undefined,
-    currency: "USD",
-  },
   mocha: {
     timeout: 400000,
   },
