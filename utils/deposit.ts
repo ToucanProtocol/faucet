@@ -1,19 +1,20 @@
 import { ethers } from "hardhat";
-import {TCO2Faucet, ToucanCarbonOffsets} from "../typechain";
+import {BaseCarbonTonne, NatureCarbonTonne, ToucanCarbonOffsets} from "../typechain";
 import { ContractTransaction } from "ethers";
+import {Faucet} from "../typechain/Faucet";
 
 const deposit = async (
-  tco: ToucanCarbonOffsets,
-  faucet: TCO2Faucet,
-  tco2Address: string,
+  token: ToucanCarbonOffsets | BaseCarbonTonne | NatureCarbonTonne,
+  faucet: Faucet,
+  tokenAddress: string,
   amount: string
 ): Promise<ContractTransaction> => {
   // first we use have the TCO2 contract approve up the amount of unit to be used by the Faucet contract
-  await tco.approve(faucet.address, ethers.utils.parseEther(amount));
+  await token.approve(faucet.address, ethers.utils.parseEther(amount));
 
   // we then deposit the amount of TCO2 into the DEX contract
   const depositTxn = await faucet.deposit(
-    tco2Address,
+      tokenAddress,
     ethers.utils.parseEther(amount),
     {
       gasLimit: 1200000,

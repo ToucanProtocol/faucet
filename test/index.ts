@@ -2,7 +2,7 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { ethers, network } from "hardhat";
 // eslint-disable-next-line node/no-missing-import,camelcase
-import { TCO2Faucet, TCO2Faucet__factory, ToucanCarbonOffsets} from "../typechain";
+import {Faucet, Faucet__factory, ToucanCarbonOffsets} from "../typechain";
 import * as tcoAbi from "../artifacts/contracts/CO2KEN_contracts/ToucanCarbonOffsets.sol/ToucanCarbonOffsets.json";
 import deposit from "../utils/deposit";
 import { BigNumber } from "ethers";
@@ -23,7 +23,7 @@ const TCO2_VCS_674_2014 : string = "0xF7e61e0084287890E35e46dc7e077d7E5870Ae27";
 const myAddress: string = "0x721F6f7A29b99CbdE1F18C4AA7D7AEb31eb2923B";
 
 describe("TCO2Faucet", function () {
-  let faucet: TCO2Faucet;
+  let faucet: Faucet;
   let tco1: ToucanCarbonOffsets;
   let tco2: ToucanCarbonOffsets;
   let tco3: ToucanCarbonOffsets;
@@ -50,12 +50,12 @@ describe("TCO2Faucet", function () {
     [addr1, addr2, ...addrs] = await ethers.getSigners();
 
     // we deploy a Faucet contract and get a portal to it
-    const TCO2FaucetFactory = (await ethers.getContractFactory(
-      "TCO2Faucet",
+    const FaucetFactory = (await ethers.getContractFactory(
+      "Faucet",
       owner
       // eslint-disable-next-line camelcase
-    )) as TCO2Faucet__factory;
-    faucet = await TCO2FaucetFactory.deploy();
+    )) as Faucet__factory;
+    faucet = await FaucetFactory.deploy();
 
     // we instantiate a portal to some TCO2 contracts
     // @ts-ignore
@@ -119,7 +119,7 @@ describe("TCO2Faucet", function () {
        * we attempt to withdraw an amount of TCO2 from the Faucet contract.
        * I have separated in the withdraw() function for readability
        */
-      await withdraw(tco1, faucet, tco1.address, amountToWithdraw);
+      await withdraw(faucet, tco1.address, amountToWithdraw);
 
       /**
        * we check my TCO2 balance after withdrawing some of it from the faucet
@@ -157,7 +157,7 @@ describe("TCO2Faucet", function () {
        * we attempt to withdraw an amount of TCO2 from the Faucet contract.
        * I have separated in the withdraw() function for readability
        */
-      await withdraw(tco3, faucet, tco3.address, amountToWithdraw);
+      await withdraw(faucet, tco3.address, amountToWithdraw);
 
       /**
        * we check my TCO2 balance after withdrawing some of it from the faucet
@@ -190,7 +190,7 @@ describe("TCO2Faucet", function () {
       /**
        * we attempt the first withdrawal, which should work
        */
-      await withdraw(tco1, faucet, TCO2_VCS_439_2008, amountToWithdraw);
+      await withdraw(faucet, TCO2_VCS_439_2008, amountToWithdraw);
 
       /**
        * we attempt the second withdrawal, which should not work

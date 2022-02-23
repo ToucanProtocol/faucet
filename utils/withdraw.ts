@@ -1,16 +1,15 @@
 import { ethers } from "hardhat";
-import {TCO2Faucet, ToucanCarbonOffsets} from "../typechain";
 import { ContractTransaction } from "ethers";
+import {Faucet} from "../typechain/Faucet";
 
 const withdraw = async (
-    tco: ToucanCarbonOffsets,
-    faucet: TCO2Faucet,
-    tco2Address: string,
+    faucet: Faucet,
+    tokenAddress: string,
     amount: string
 ): Promise<ContractTransaction> => {
-    // we then withdraw the amount of TCO2 from the Faucet contract
+    // we then withdraw the amount of tokens from the Faucet contract
     const withdrawTxn = await faucet.withdraw(
-        tco2Address,
+        tokenAddress,
         ethers.utils.parseEther(amount),
         {
             gasLimit: 1200000,

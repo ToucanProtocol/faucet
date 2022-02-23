@@ -10,7 +10,8 @@ import "./CO2KEN_contracts/pools/BaseCarbonTonne.sol";
 import "./CO2KEN_contracts/IToucanContractRegistry.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-contract TCO2Faucet is OwnableUpgradeable {
+// what started as a TCO2 faucet has become a faucet for BCT & NCT as well
+contract Faucet is OwnableUpgradeable {
     using SafeERC20 for IERC20;
 
     address public contractRegistry = 0x6739D490670B2710dc7E79bB12E455DE33EE1cb6;
