@@ -14,6 +14,8 @@ contract TCO2Faucet is OwnableUpgradeable {
     using SafeERC20 for IERC20;
 
     address public contractRegistry = 0x6739D490670B2710dc7E79bB12E455DE33EE1cb6;
+    address public bctAddress = 0xf2438A14f668b1bbA53408346288f3d7C71c10a1;
+    address public nctAddress = 0x7beCBA11618Ca63Ead5605DE235f6dD3b25c530E;
     mapping(address => uint256) private tokenBalances;
     mapping(address => uint256) private lastWithdrawalTimes;
     event Deposited(address erc20Addr, uint256 amount);
@@ -40,10 +42,13 @@ contract TCO2Faucet is OwnableUpgradeable {
     view
     returns (bool)
     {
-        // check if token is a TCO2
         bool isToucanContract = IToucanContractRegistry(contractRegistry)
         .checkERC20(_erc20Address);
         if (isToucanContract) return true;
+
+        if (_erc20Address == bctAddress) return true;
+
+        if (_erc20Address == nctAddress) return true;
 
         // nothing matches, return false
         return false;
