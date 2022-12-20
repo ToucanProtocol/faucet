@@ -1,7 +1,6 @@
-import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { ethers, network } from "hardhat";
-import { Faucet, Faucet__factory, IERC20, IERC20__factory } from "../typechain";
+import { Faucet__factory, IERC20__factory } from "../typechain";
 
 import deposit from "../utils/deposit";
 import withdraw from "../utils/withdraw";
@@ -14,20 +13,7 @@ const TCO2_VCS_674_2014: string = "0xF7e61e0084287890E35e46dc7e077d7E5870Ae27";
 const myAddress: string = "0x721F6f7A29b99CbdE1F18C4AA7D7AEb31eb2923B";
 
 describe("TCO2Faucet", function () {
-  let faucet: Faucet;
-  let tco1: IERC20;
-  let tco2: IERC20;
-  let tco3: IERC20;
-  let owner: SignerWithAddress;
-  let addr1: SignerWithAddress;
-  let addr2: SignerWithAddress;
-  let addrs: SignerWithAddress[];
-
-  beforeEach(async function () {
-    /**
-     * if we are forking Mumbai (which I chose to do for performance, so I can test & iterate faster)
-     * we impersonate my Mumbai account (I have TCO2, BCT & MATIC on it at the blockNumber I chose)
-     */
+  async function prepareEnvFixture() {
     if (network.name === "hardhat") {
       await network.provider.request({
         method: "hardhat_impersonateAccount",
@@ -35,27 +21,26 @@ describe("TCO2Faucet", function () {
       });
     }
 
-    // we get a signer based on my above address (I have TCO2, BCT & MATIC on it at the blockNumber I chose)
-    owner = await ethers.getSigner(myAddress);
-    // and we get a bunch of other random signers
-    [addr1, addr2, ...addrs] = await ethers.getSigners();
+    const owner = await ethers.getSigner(myAddress);
+    const [addr1, addr2, ...addrs] = await ethers.getSigners();
 
-    // we deploy a Faucet contract and get a portal to it
     const FaucetFactory = (await ethers.getContractFactory(
       "Faucet",
       owner
-      // eslint-disable-next-line camelcase
     )) as Faucet__factory;
-    faucet = await FaucetFactory.deploy();
+    const faucet = await FaucetFactory.deploy();
 
-    // we instantiate a portal to some TCO2 contracts
-    tco1 = IERC20__factory.connect(TCO2_VCS_439_2008, owner);
-    tco2 = IERC20__factory.connect(TCO2_VCS_1190_2018, owner);
-    tco3 = IERC20__factory.connect(TCO2_VCS_674_2014, owner);
-  });
+    const tco1 = IERC20__factory.connect(TCO2_VCS_439_2008, owner);
+    const tco2 = IERC20__factory.connect(TCO2_VCS_1190_2018, owner);
+    const tco3 = IERC20__factory.connect(TCO2_VCS_674_2014, owner);
+
+    return { faucet, tco1, tco2, tco3, owner, addr1, addr2, addrs };
+  }
 
   describe("Deposit", function () {
     it("Should deposit 1 TCO2_VCS_439_2008", async function () {
+      const { faucet, tco1 } = await prepareEnvFixture();
+
       const amountToDeposit = "1.0";
 
       /**
@@ -90,6 +75,8 @@ describe("TCO2Faucet", function () {
 
   describe("Withdraw", function () {
     it("Should withdraw 1 TCO2_VCS_439_2008", async function () {
+      const { faucet, tco1 } = await prepareEnvFixture();
+
       const amountToWithdraw = "1.0";
 
       /**
@@ -128,6 +115,8 @@ describe("TCO2Faucet", function () {
     });
 
     it("Should withdraw 1 TCO2_VCS_674_2014", async function () {
+      const { faucet, tco3 } = await prepareEnvFixture();
+
       const amountToWithdraw = "1.0";
 
       /**
@@ -166,6 +155,8 @@ describe("TCO2Faucet", function () {
     });
 
     it("Should revert the second transaction with a timeout", async () => {
+      const { faucet, tco1 } = await prepareEnvFixture();
+
       const amountToDeposit = "2.0";
       const amountToWithdraw = "1.0";
 
