@@ -1,20 +1,16 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
-import "hardhat/console.sol";
+import {console} from "hardhat/console.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-// You can't import contracts via https from GH. So I just copied these contracts over.
-// You could use NPM publish, but this works for now.
-import "./CO2KEN_contracts/ToucanCarbonOffsets.sol";
-import "./CO2KEN_contracts/pools/BaseCarbonTonne.sol";
-import "./CO2KEN_contracts/IToucanContractRegistry.sol";
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {IToucanContractRegistry} from "./interfaces/IToucanContractRegistry.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
-// what started as a TCO2 faucet has become a faucet for BCT & NCT as well
-contract Faucet is OwnableUpgradeable {
+contract Faucet is Ownable {
     using SafeERC20 for IERC20;
 
-    address public contractRegistry = 0x6739D490670B2710dc7E79bB12E455DE33EE1cb6;
+    address public contractRegistry =
+        0x6739D490670B2710dc7E79bB12E455DE33EE1cb6;
     address public bctAddress = 0xf2438A14f668b1bbA53408346288f3d7C71c10a1;
     address public nctAddress = 0x7beCBA11618Ca63Ead5605DE235f6dD3b25c530E;
     mapping(address => uint256) private tokenBalances;
@@ -24,27 +20,25 @@ contract Faucet is OwnableUpgradeable {
 
     // @description you can use this to change the TCO2 contracts registry if needed
     // @param _address the contract registry to use
-    function setToucanContractRegistry(address _address)
-    public
-    virtual
-    onlyOwner
-    {
+    function setToucanContractRegistry(
+        address _address
+    ) public virtual onlyOwner {
         contractRegistry = _address;
     }
 
-    function getTokenBalance(address _erc20Address) public view returns (uint256) {
+    function getTokenBalance(
+        address _erc20Address
+    ) public view returns (uint256) {
         return tokenBalances[_erc20Address];
     }
 
     // @description checks if token to be deposited is eligible for this pool
     // @param _erc20Address address to be checked
-    function checkTokenEligibility(address _erc20Address)
-    private
-    view
-    returns (bool)
-    {
+    function checkTokenEligibility(
+        address _erc20Address
+    ) private view returns (bool) {
         bool isToucanContract = IToucanContractRegistry(contractRegistry)
-        .checkERC20(_erc20Address);
+            .checkERC20(_erc20Address);
         if (isToucanContract) return true;
 
         if (_erc20Address == bctAddress) return true;
@@ -65,7 +59,11 @@ contract Faucet is OwnableUpgradeable {
         require(eligibility, "Token rejected");
 
         // use TCO contract to do a safe transfer from the user to this contract
-        IERC20(_erc20Address).safeTransferFrom(msg.sender, address(this), _amount);
+        IERC20(_erc20Address).safeTransferFrom(
+            msg.sender,
+            address(this),
+            _amount
+        );
 
         // add amount of said token to balance sheet of this contract
         tokenBalances[_erc20Address] += _amount;
