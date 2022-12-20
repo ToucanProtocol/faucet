@@ -9,14 +9,24 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 contract Faucet is Ownable {
     using SafeERC20 for IERC20;
 
-    address public contractRegistry =
-        0x6739D490670B2710dc7E79bB12E455DE33EE1cb6;
-    address public bctAddress = 0xf2438A14f668b1bbA53408346288f3d7C71c10a1;
-    address public nctAddress = 0x7beCBA11618Ca63Ead5605DE235f6dD3b25c530E;
+    address public contractRegistry;
+    address public bctAddress;
+    address public nctAddress;
     mapping(address => uint256) private tokenBalances;
     mapping(address => uint256) private lastWithdrawalTimes;
     event Deposited(address erc20Addr, uint256 amount);
     event Withdrawn(address account, address erc20Addr, uint256 amount);
+
+    // constructor that sets the contract registry, bct address, and nct address
+    constructor(
+        address _contractRegistry,
+        address _bctAddress,
+        address _nctAddress
+    ) {
+        contractRegistry = _contractRegistry;
+        bctAddress = _bctAddress;
+        nctAddress = _nctAddress;
+    }
 
     // @description you can use this to change the TCO2 contracts registry if needed
     // @param _address the contract registry to use
