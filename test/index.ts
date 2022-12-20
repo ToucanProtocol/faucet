@@ -1,32 +1,23 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { ethers, network } from "hardhat";
-// eslint-disable-next-line node/no-missing-import,camelcase
-import {Faucet, Faucet__factory, ToucanCarbonOffsets} from "../typechain";
-import * as tcoAbi from "../artifacts/contracts/CO2KEN_contracts/ToucanCarbonOffsets.sol/ToucanCarbonOffsets.json";
+import { Faucet, Faucet__factory, IERC20, IERC20__factory } from "../typechain";
+
 import deposit from "../utils/deposit";
-import { BigNumber } from "ethers";
 import withdraw from "../utils/withdraw";
 
-// this is the TCO2 address from the test.toucan.earth/contracts list for Mumbai network
-// const TCO2_VCS_439_2008: string = "0x788d12e9f6E5D65a0Fa4C3f5D6AA34Ef39A6E582";
-
-/**
- * This is my the address of my TCO2 coins.
- * I got it from my test project (Yingpeng HFC23 Decompostion Project).
- */
 const TCO2_VCS_439_2008: string = "0xa5831eb637dff307395b5183c86b04c69c518681";
 const TCO2_VCS_1190_2018: string = "0xD3Ad9Dc261CA44b153125541D66Af2CF372C316a";
-const TCO2_VCS_674_2014 : string = "0xF7e61e0084287890E35e46dc7e077d7E5870Ae27";
+const TCO2_VCS_674_2014: string = "0xF7e61e0084287890E35e46dc7e077d7E5870Ae27";
 
 // and this is the address that I wish to deploy from
 const myAddress: string = "0x721F6f7A29b99CbdE1F18C4AA7D7AEb31eb2923B";
 
 describe("TCO2Faucet", function () {
   let faucet: Faucet;
-  let tco1: ToucanCarbonOffsets;
-  let tco2: ToucanCarbonOffsets;
-  let tco3: ToucanCarbonOffsets;
+  let tco1: IERC20;
+  let tco2: IERC20;
+  let tco3: IERC20;
   let owner: SignerWithAddress;
   let addr1: SignerWithAddress;
   let addr2: SignerWithAddress;
@@ -58,12 +49,9 @@ describe("TCO2Faucet", function () {
     faucet = await FaucetFactory.deploy();
 
     // we instantiate a portal to some TCO2 contracts
-    // @ts-ignore
-    tco1 = new ethers.Contract(TCO2_VCS_439_2008, tcoAbi.abi, owner);
-    // @ts-ignore
-    tco2 = new ethers.Contract(TCO2_VCS_1190_2018, tcoAbi.abi, owner);
-    // @ts-ignore
-    tco3 = new ethers.Contract(TCO2_VCS_674_2014, tcoAbi.abi, owner);
+    tco1 = IERC20__factory.connect(TCO2_VCS_439_2008, owner);
+    tco2 = IERC20__factory.connect(TCO2_VCS_1190_2018, owner);
+    tco3 = IERC20__factory.connect(TCO2_VCS_674_2014, owner);
   });
 
   describe("Deposit", function () {
@@ -127,7 +115,7 @@ describe("TCO2Faucet", function () {
        */
       const myTcoBalanceAfter = await tco1.balanceOf(myAddress);
       const expectedTcoBalance = myTcoBalanceBefore.add(
-          ethers.utils.parseEther(amountToWithdraw)
+        ethers.utils.parseEther(amountToWithdraw)
       );
       expect(myTcoBalanceAfter).to.eql(expectedTcoBalance);
 
@@ -165,7 +153,7 @@ describe("TCO2Faucet", function () {
        */
       const myTcoBalanceAfter = await tco3.balanceOf(myAddress);
       const expectedTcoBalance = myTcoBalanceBefore.add(
-          ethers.utils.parseEther(amountToWithdraw)
+        ethers.utils.parseEther(amountToWithdraw)
       );
       expect(myTcoBalanceAfter).to.eql(expectedTcoBalance);
 
@@ -202,13 +190,15 @@ describe("TCO2Faucet", function () {
        * the transaction still gets reverted (with the correct error), but the test doesn't see it.
        * Absolutely 0 idea why...
        */
-      await expect(faucet.withdraw(
+      await expect(
+        faucet.withdraw(
           TCO2_VCS_439_2008,
           ethers.utils.parseEther(amountToWithdraw),
           {
             gasLimit: 1200000,
           }
-      )).to.be.revertedWith("Cannot withdraw that often");
-    })
+        )
+      ).to.be.revertedWith("Cannot withdraw that often");
+    });
   });
 });
