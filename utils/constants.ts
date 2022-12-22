@@ -1,4 +1,4 @@
-export const deploymentAddresses = {
+export const deploymentAddresses: Record<string, Record<string, string>> = {
   mumbai: {
     CONTRACT_REGISTRY_ADDRESS: "0x6739D490670B2710dc7E79bB12E455DE33EE1cb6",
     BCT_ADDRESS: "0xf2438A14f668b1bbA53408346288f3d7C71c10a1",
