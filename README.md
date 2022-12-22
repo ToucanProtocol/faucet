@@ -1,46 +1,24 @@
-# Advanced Sample Hardhat Project
+# What is the Faucet?
 
-This project demonstrates an advanced Hardhat use case, integrating other tools commonly used alongside Hardhat in the ecosystem.
+The Faucet is a contract that allows users to claim free tokens for the Toucan ecosystem (like TCO2s, BCT, NCT) on testnet networks.
 
-The project comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts. It also comes with a variety of other tools, preconfigured to work with the project code.
+It currently is deployed on the following networks:
 
-Try running some of the following tasks:
+- Mumbai: [0x0564A412E44dE08fd039E67FC9B323Dc521eF410](https://mumbai.polygonscan.com/address/0x0564A412E44dE08fd039E67FC9B323Dc521eF410)
+- Alfajores: [0x343cbBb380B6705Bdc8b587c614acBD4A541Ca34](https://alfajores.celoscan.io/address/0x343cbBb380B6705Bdc8b587c614acBD4A541Ca34)
 
-```shell
-npx hardhat accounts
-npx hardhat compile
-npx hardhat clean
-npx hardhat test
-npx hardhat node
-npx hardhat help
-REPORT_GAS=true npx hardhat test
-npx hardhat coverage
-npx hardhat run scripts/deploy.ts
-TS_NODE_FILES=true npx ts-node scripts/deploy.ts
-npx eslint '**/*.{js,ts}'
-npx eslint '**/*.{js,ts}' --fix
-npx prettier '**/*.{json,sol,md}' --check
-npx prettier '**/*.{json,sol,md}' --write
-npx solhint 'contracts/**/*.sol'
-npx solhint 'contracts/**/*.sol' --fix
+# Faucet Deployment Check List
+
+```bash
+# install dependencies
+yarn install
+
+# test the contract
+yarn hardhat test
+
+# deploy the contract
+yarn hardhat deploy --network <network>
+
+# verify the contract
+yarn hardhat verify --network <network to verify for> --contract "contracts/Faucet.sol:Faucet" <Faucet address> <toucan contract registry address> <BCT address> <NCT address>
 ```
-
-# Etherscan verification
-
-To try out Etherscan verification, you first need to deploy a contract to an Ethereum network that's supported by Etherscan, such as Ropsten.
-
-In this project, copy the .env.example file to a file named .env, and then edit it to fill in the details. Enter your Etherscan API key, your Ropsten node URL (eg from Alchemy), and the private key of the account which will send the deployment transaction. With a valid .env file in place, first deploy your contract:
-
-```shell
-hardhat run --network ropsten scripts/sample-script.ts
-```
-
-Then, copy the deployment address and paste it in to replace `DEPLOYED_CONTRACT_ADDRESS` in this command:
-
-```shell
-npx hardhat verify --network ropsten DEPLOYED_CONTRACT_ADDRESS "Hello, Hardhat!"
-```
-
-# Performance optimizations
-
-For faster runs of your tests and scripts, consider skipping ts-node's type checking by setting the environment variable `TS_NODE_TRANSPILE_ONLY` to `1` in hardhat's environment. For more details see [the documentation](https://hardhat.org/guides/typescript.html#performance-optimizations).

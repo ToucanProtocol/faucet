@@ -1,6 +1,7 @@
 import { expect } from "chai";
 import { ethers, network } from "hardhat";
 import { Faucet__factory, IERC20, IERC20__factory } from "../typechain";
+import { deploymentAddresses } from "../utils/constants";
 
 import deposit from "../utils/deposit";
 import withdraw from "../utils/withdraw";
@@ -30,7 +31,13 @@ describe("TCO2Faucet", function () {
       "Faucet",
       owner
     )) as Faucet__factory;
-    const faucet = await FaucetFactory.deploy();
+    const { CONTRACT_REGISTRY_ADDRESS, BCT_ADDRESS, NCT_ADDRESS } =
+      deploymentAddresses.mumbai;
+    const faucet = await FaucetFactory.deploy(
+      CONTRACT_REGISTRY_ADDRESS,
+      BCT_ADDRESS,
+      NCT_ADDRESS
+    );
 
     let TCO2Contracts: Record<string, IERC20> = {};
 
