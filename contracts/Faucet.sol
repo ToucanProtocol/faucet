@@ -112,12 +112,6 @@ contract Faucet is Ownable {
         require(!checkIfWithdrawalTimeout(), "Cannot withdraw that often");
         lastWithdrawalTimes[msg.sender] = block.timestamp;
 
-        // require that the person didn't request more than the contract has
-        require(
-            IERC20(_erc20Address).balanceOf(address(this)) >= _amount,
-            "Cannot withdraw more than is stored in contract"
-        );
-
         // use TCO contract to do a safe transfer from this contract to the user
         IERC20(_erc20Address).safeTransfer(msg.sender, _amount);
 
