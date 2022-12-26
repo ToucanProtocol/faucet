@@ -124,4 +124,14 @@ contract Faucet is Ownable {
         // emit an event for good measure
         emit Withdrawn(msg.sender, _erc20Address, _amount);
     }
+
+    /// @notice function that is only callable by owner and can withdraw as many tokens from this contract as they want
+    /// @param _erc20Address address of the token to be withdrawn
+    /// @param _amount amount of tokens to be withdrawn
+    function ownerWithdraw(
+        address _erc20Address,
+        uint256 _amount
+    ) public onlyOwner {
+        IERC20(_erc20Address).safeTransfer(msg.sender, _amount);
+    }
 }
