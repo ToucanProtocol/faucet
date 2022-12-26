@@ -102,6 +102,8 @@ contract Faucet is Ownable {
         require(!checkIfWithdrawalTimeout(), "Cannot withdraw that often");
         lastWithdrawalTimes[msg.sender] = block.timestamp;
 
+        require(_amount <= 5 ether, "Cannot withdraw more than 5 tokens");
+
         IERC20(_erc20Address).safeTransfer(msg.sender, _amount);
 
         emit Withdrawn(msg.sender, _erc20Address, _amount);
