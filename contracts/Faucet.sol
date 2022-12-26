@@ -12,7 +12,6 @@ contract Faucet is Ownable {
     address public contractRegistry;
     address public bctAddress;
     address public nctAddress;
-    mapping(address => uint256) private tokenBalances;
     mapping(address => uint256) private lastWithdrawalTimes;
     event Deposited(address erc20Addr, uint256 amount);
     event Withdrawn(address account, address erc20Addr, uint256 amount);
@@ -34,12 +33,6 @@ contract Faucet is Ownable {
         address _address
     ) public virtual onlyOwner {
         contractRegistry = _address;
-    }
-
-    function getTokenBalance(
-        address _erc20Address
-    ) public view returns (uint256) {
-        return tokenBalances[_erc20Address];
     }
 
     // @description checks if token to be deposited is eligible for this pool
@@ -75,9 +68,6 @@ contract Faucet is Ownable {
             _amount
         );
 
-        // add amount of said token to balance sheet of this contract
-        tokenBalances[_erc20Address] += _amount;
-
         // emit an event for good measure
         emit Deposited(_erc20Address, _amount);
     }
@@ -111,12 +101,9 @@ contract Faucet is Ownable {
 
         // require that the person didn't request more than the contract has
         require(
-            tokenBalances[_erc20Address] >= _amount,
+            IERC20(_erc20Address).balanceOf(address(this)) >= _amount,
             "Cannot withdraw more than is stored in contract"
         );
-
-        // subtract amount of said token from the balance sheet of this contract
-        tokenBalances[_erc20Address] -= _amount;
 
         // use TCO contract to do a safe transfer from this contract to the user
         IERC20(_erc20Address).safeTransfer(msg.sender, _amount);

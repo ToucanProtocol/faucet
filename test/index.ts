@@ -70,9 +70,6 @@ describe("TCO2Faucet", function () {
           ethers.utils.parseEther(amount)
         );
         expect(myTcoBalanceAfter).to.eql(expectedTcoBalance);
-
-        const faucetTcoBalance = await faucet.getTokenBalance(tco2Address);
-        expect(ethers.utils.formatEther(faucetTcoBalance)).to.eql("1.0");
       });
     }
   });
@@ -104,9 +101,6 @@ describe("TCO2Faucet", function () {
           ethers.utils.parseEther(amountToWithdraw)
         );
         expect(myTcoBalanceAfter).to.eql(expectedTcoBalance);
-
-        const faucetTcoBalance = await faucet.getTokenBalance(tco2Address);
-        expect(ethers.utils.formatEther(faucetTcoBalance)).to.eql("0.0");
       });
 
       it(`Should revert withdrawing ${tco2Name} with a timeout error`, async () => {
