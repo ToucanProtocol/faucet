@@ -35,6 +35,19 @@ contract Faucet is Ownable {
         contractRegistry = _address;
     }
 
+    /// @notice A function to get the Faucet's balances of multiple tokens at once
+    /// @param _erc20Addresses An array of ERC20 contract addresses
+    /// @return An array of balances
+    function getTokenBalances(
+        address[] memory _erc20Addresses
+    ) public view returns (uint256[] memory) {
+        uint256[] memory balances = new uint256[](_erc20Addresses.length);
+        for (uint256 i = 0; i < _erc20Addresses.length; i++) {
+            balances[i] = IERC20(_erc20Addresses[i]).balanceOf(address(this));
+        }
+        return balances;
+    }
+
     // @description checks if token to be deposited is eligible for this pool
     // @param _erc20Address address to be checked
     function checkTokenEligibility(
