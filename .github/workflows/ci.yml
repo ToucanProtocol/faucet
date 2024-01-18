@@ -61,3 +61,10 @@ jobs:
 
       - name: Deploy contracts
         run: yarn hardhat deploy --network hardhat
+        # This shouldn't be needed but because forking
+        # mode is always enabled in the hardhat config
+        # we need to define the mumbai URL here.
+        # TODO: Make forking mode configurable and
+        # remove this from here.
+        env:
+          MUMBAI_URL: ${{ secrets.MUMBAI_RPC_URL }}
