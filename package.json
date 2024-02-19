@@ -34,9 +34,13 @@
     "typescript": "^4.5.5"
   },
   "dependencies": {
+    "@defi-wonderland/smock": "^2.3.5",
     "@nomicfoundation/hardhat-network-helpers": "^1.0.7",
     "@openzeppelin/contracts": "^4.8.0",
     "@openzeppelin/contracts-upgradeable": "^4.4.2",
+    "@types/chai-as-promised": "^7.1.8",
+    "chai-as-promised": "^7.1.1",
+    "mocha": "^10.3.0",
     "solc": "^0.8.11"
   }
 }
