@@ -20,7 +20,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   await deploy("Faucet", {
     from: deployer,
-    args: [CONTRACT_REGISTRY_ADDRESS, BCT_ADDRESS, NCT_ADDRESS],
+    args: [CONTRACT_REGISTRY_ADDRESS, [BCT_ADDRESS, NCT_ADDRESS]],
     log: true,
     autoMine: true, // speed up deployment on local network (ganache, hardhat), no effect on live networks
   });
