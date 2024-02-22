@@ -31,12 +31,7 @@ describe("TCO2Faucet", function () {
       "Faucet",
       owner
     )) as Faucet__factory;
-    const { CONTRACT_REGISTRY_ADDRESS, BCT_ADDRESS, NCT_ADDRESS } =
-      deploymentAddresses.mumbai;
-    const faucet = await FaucetFactory.deploy(CONTRACT_REGISTRY_ADDRESS, [
-      BCT_ADDRESS,
-      NCT_ADDRESS,
-    ]);
+    const faucet = await FaucetFactory.deploy();
 
     let TCO2Contracts: Record<string, IERC20> = {};
 

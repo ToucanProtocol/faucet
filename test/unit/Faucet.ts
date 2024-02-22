@@ -11,7 +11,7 @@ import { use, expect } from "chai";
 import chaiAsPromised from "chai-as-promised";
 
 import { solidity } from "ethereum-waffle";
-import { Faucet, IERC20, IToucanContractRegistry } from "../../typechain";
+import { Faucet, IERC20 } from "../../typechain";
 import { ethers, network } from "hardhat";
 import { BigNumber } from "ethers";
 
@@ -24,8 +24,6 @@ describe("Faucet", async () => {
   let alice: SignerWithAddress;
   let fakePool1: FakeContract<IERC20>;
   let fakePool2: FakeContract<IERC20>;
-  let fakePool3: FakeContract<IERC20>;
-  let fakeToucanContractRegistry: FakeContract<IToucanContractRegistry>;
   let faucet: Faucet;
   let maxWithdrawalAmount: BigNumber;
   let timeoutLimit: BigNumber;
@@ -33,50 +31,17 @@ describe("Faucet", async () => {
   beforeEach(async () => {
     [owner, alice] = await ethers.getSigners();
 
-    fakeToucanContractRegistry = await smock.fake<IToucanContractRegistry>(
-      "IToucanContractRegistry"
-    );
-    fakeToucanContractRegistry.checkERC20.returns(true);
-
     fakePool1 = await smock.fake<IERC20>("IERC20");
     fakePool1.transfer.returns(true);
     fakePool1.transferFrom.returns(true);
 
     fakePool2 = await smock.fake<IERC20>("IERC20");
-    fakePool3 = await smock.fake<IERC20>("IERC20");
 
     const faucetFactory = await ethers.getContractFactory("Faucet");
-    faucet = (await faucetFactory.deploy(fakeToucanContractRegistry.address, [
-      fakePool1.address,
-      fakePool2.address,
-    ])) as Faucet;
+    faucet = (await faucetFactory.deploy()) as Faucet;
 
     timeoutLimit = await faucet.TIMEOUT_LIMIT();
     maxWithdrawalAmount = await faucet.MAX_WITHDRAWAL_AMOUNT();
-  });
-
-  describe("setPoolEligible", async () => {
-    it("reverts when called by a non-owner", async () => {
-      await expect(
-        faucet.connect(alice).setPoolEligible(fakePool1.address, false)
-      ).revertedWith("Ownable: caller is not the owner");
-    });
-
-    it("sets the pool as eligible", async () => {
-      await faucet.setPoolEligible(fakePool3.address, true);
-
-      const result = await faucet.isPoolEligible(fakePool3.address);
-
-      expect(result).equal(true);
-    });
-
-    it("sets the pool as uneligible", async () => {
-      await faucet.setPoolEligible(fakePool2.address, false);
-
-      const result = await faucet.isPoolEligible(fakePool2.address);
-
-      expect(result).equal(false);
-    });
   });
 
   describe("getTokenBalance", async () => {
@@ -105,16 +70,6 @@ describe("Faucet", async () => {
   });
 
   describe("deposit", async () => {
-    it("reverts when the address is neither an eligible pool nor a valid toucan contract", async () => {
-      fakeToucanContractRegistry.checkERC20.reset();
-      fakeToucanContractRegistry.checkERC20.returns(false);
-      await faucet.setPoolEligible(fakePool1.address, false);
-
-      await expect(faucet.deposit(fakePool3.address, 42)).revertedWith(
-        "Token rejected"
-      );
-    });
-
     it("transfers the given amount of tokens from the sender to the faucet", async () => {
       const transferredAmount = BigNumber.from(42);
       await faucet.connect(alice).deposit(fakePool1.address, transferredAmount);
@@ -124,15 +79,6 @@ describe("Faucet", async () => {
         faucet.address,
         transferredAmount
       );
-    });
-
-    it("emits a Deposited event", async () => {
-      const transferredAmount = BigNumber.from(42);
-      await expect(
-        faucet.connect(alice).deposit(fakePool1.address, transferredAmount)
-      )
-        .to.emit(faucet, "Deposited")
-        .withArgs(fakePool1.address, transferredAmount);
     });
   });
 
@@ -167,16 +113,6 @@ describe("Faucet", async () => {
   });
 
   describe("withdraw", async () => {
-    it("reverts when the address is neither an eligible pool nor a valid toucan contract", async () => {
-      fakeToucanContractRegistry.checkERC20.reset();
-      fakeToucanContractRegistry.checkERC20.returns(false);
-      await faucet.setPoolEligible(fakePool1.address, false);
-
-      await expect(faucet.deposit(fakePool3.address, 42)).revertedWith(
-        "Token rejected"
-      );
-    });
-
     it("reverts when on withdrawal timeout", async () => {
       await faucet.withdraw(fakePool1.address, 42);
 
@@ -203,16 +139,6 @@ describe("Faucet", async () => {
       );
     });
 
-    it("emits a Withdrawn event", async () => {
-      const transferredAmount = BigNumber.from(42);
-
-      await expect(
-        faucet.connect(alice).withdraw(fakePool1.address, transferredAmount)
-      )
-        .to.emit(faucet, "Withdrawn")
-        .withArgs(alice.address, fakePool1.address, transferredAmount);
-    });
-
     it("succeeds when called a second time after the timeout", async () => {
       const transferredAmount = BigNumber.from(42);
       await faucet
@@ -225,9 +151,11 @@ describe("Faucet", async () => {
       ]);
       await network.provider.send("evm_mine");
 
-      await expect(
-        faucet.connect(alice).withdraw(fakePool1.address, transferredAmount)
-      ).to.emit(faucet, "Withdrawn");
+      await faucet
+        .connect(alice)
+        .withdraw(fakePool1.address, transferredAmount);
+
+      expect(fakePool1.transfer).callCount(2);
     });
   });
 
