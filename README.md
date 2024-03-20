@@ -17,5 +17,5 @@ yarn hardhat test
 yarn hardhat deploy --network <network>
 
 # verify the contract
-yarn hardhat verify --network <network to verify for> --contract "contracts/Faucet.sol:Faucet" <Faucet address> <toucan contract registry address> <BCT address> <NCT address>
+yarn hardhat verify --network <network> --contract "contracts/Faucet.sol:Faucet" <address>
 ```

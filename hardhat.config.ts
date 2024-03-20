@@ -36,18 +36,18 @@ const config: HardhatUserConfig = {
   },
   networks: {
     mumbai: {
-      url: process.env.MUMBAI_URL || "",
+      url: process.env.MUMBAI_URL || 'https://polygon-mumbai-bor-rpc.publicnode.com',
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
     alfajores: {
-      url: process.env.ALFAJORES_URL || "",
+      url: process.env.ALFAJORES_URL || 'https://alfajores-forno.celo-testnet.org',
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
     hardhat: {
       forking: {
-        url: process.env.MUMBAI_URL || "",
+        url: process.env.MUMBAI_URL || 'https://polygon-mumbai-bor-rpc.publicnode.com',
         blockNumber: 24578369,
       },
     },
