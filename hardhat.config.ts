@@ -45,6 +45,11 @@ const config: HardhatUserConfig = {
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
+    'base-sepolia': {
+      url: process.env.BASE_SEPOLIA_URL || 'https://sepolia.base.org',
+      accounts:
+        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    },
     hardhat: {
       forking: {
         url: process.env.MUMBAI_URL || 'https://polygon-mumbai-bor-rpc.publicnode.com',
@@ -57,26 +62,25 @@ const config: HardhatUserConfig = {
   },
   etherscan: {
     apiKey: {
-      polygon: process.env.POLYGONSCAN_API_KEY || "",
       polygonMumbai: process.env.POLYGONSCAN_API_KEY || "",
-      celo: process.env.CELO_API_KEY || "",
-      alfajores: process.env.CELO_API_KEY || "",
+      alfajores: process.env.CELOSCAN_API_KEY || "",
+      baseSepolia: process.env.BASESCAN_API_KEY || "",
     },
     customChains: [
-      {
-        network: "celo",
-        chainId: 42220,
-        urls: {
-          apiURL: "https://api.celoscan.io/api",
-          browserURL: "https://celoscan.io/",
-        },
-      },
       {
         network: "alfajores",
         chainId: 44787,
         urls: {
           apiURL: "https://api-alfajores.celoscan.io/api",
           browserURL: "https://alfajores.celoscan.io/",
+        },
+      },
+      {
+        network: "baseSepolia",
+        chainId: 84532,
+        urls: {
+          apiURL: 'https://api-sepolia.basescan.org/api',
+          browserURL: 'https://sepolia.basescan.org/',
         },
       },
     ],
