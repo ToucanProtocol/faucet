@@ -35,11 +35,6 @@ const config: HardhatUserConfig = {
     },
   },
   networks: {
-    mumbai: {
-      url: process.env.MUMBAI_URL || 'https://polygon-mumbai-bor-rpc.publicnode.com',
-      accounts:
-        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
-    },
     alfajores: {
       url: process.env.ALFAJORES_URL || 'https://alfajores-forno.celo-testnet.org',
       accounts:
@@ -50,19 +45,12 @@ const config: HardhatUserConfig = {
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
-    hardhat: {
-      forking: {
-        url: process.env.MUMBAI_URL || 'https://polygon-mumbai-bor-rpc.publicnode.com',
-        blockNumber: 24578369,
-      },
-    },
   },
   mocha: {
     timeout: 400000,
   },
   etherscan: {
     apiKey: {
-      polygonMumbai: process.env.POLYGONSCAN_API_KEY || "",
       alfajores: process.env.CELOSCAN_API_KEY || "",
       baseSepolia: process.env.BASESCAN_API_KEY || "",
     },
