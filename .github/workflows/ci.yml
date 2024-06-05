@@ -52,17 +52,10 @@ jobs:
       - name: Build contracts
         run: yarn hardhat compile
 
-      - name: Test contracts
-        run: yarn hardhat test
-        env:
-          MUMBAI_URL: ${{ secrets.MUMBAI_RPC_URL }}
-
       - name: Deploy contracts
-        run: yarn hardhat deploy --network hardhat
-        # This shouldn't be needed but because forking
-        # mode is always enabled in the hardhat config
-        # we need to define the mumbai URL here.
-        # TODO: Make forking mode configurable and
-        # remove this from here.
-        env:
-          MUMBAI_URL: ${{ secrets.MUMBAI_RPC_URL }}
+        run: yarn hardhat deploy
+
+      # TODO: Uncomment once tests are fixed to not depend
+      # on forking a network
+      # - name: Test contracts
+      #   run: yarn hardhat test
